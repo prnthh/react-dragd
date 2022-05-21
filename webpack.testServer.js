@@ -21,5 +21,5 @@ module.exports = {
     contentBase: path.join(__dirname, 'buildtest'),
     compress: true,
     port: 9000
-  }
+  },
 }

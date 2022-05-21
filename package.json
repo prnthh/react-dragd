@@ -17,14 +17,24 @@
   "peerDependencies": {
     "react": "^16.7.0"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@giphy/js-fetch-api": "^4.1.2",
+    "@giphy/react-components": "^5.7.0",
+    "@monaco-editor/react": "^4.4.5",
+    "react-colorful": "^5.5.1",
+    "react-giphy-searchbox": "^1.5.4",
+    "react-markdown": "^8.0.3",
+    "rehype-raw": "^6.1.1"
+  },
   "devDependencies": {
     "@babel/core": "^7.4.5",
     "@babel/preset-env": "^7.4.5",
     "@babel/preset-react": "^7.0.0",
     "babel-loader": "^8.0.6",
+    "css-loader": "^5.2.7",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
+    "style-loader": "^2.0.0",
     "webpack": "^4.33.0",
     "webpack-cli": "^3.3.3",
     "webpack-dev-server": "^3.7.1"
