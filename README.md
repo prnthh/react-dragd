@@ -1,6 +1,6 @@
 # react-dragd
 
-A dyanmic UI library that allows you to build pages using drag and drop components and configurations.
+A dynamic UI library that allows you to build pages using drag and drop components and configurations.
 
 ## To start
 
