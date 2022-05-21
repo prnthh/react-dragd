@@ -1,12 +1,6 @@
-# react-component-publish
+# react-dragd
 
-A barebones boilerplate to quickly publish react components.
-
-Features Webpack 4 and Babel 7.
-
-It will compile down to commonjs, and will require a peer dependancy of react, meaning it will use whatever version of react the host project is using. Hopefully this will minimize compatibility issues.
-
-[Based on this tutorial](https://medium.com/quick-code/publish-your-own-react-component-as-npm-package-under-5-minutes-8a47f0cb92b9) by [codewithbernard](https://github.com/codewithbernard)
+A dyanmic UI library that allows you to build pages using drag and drop components and configurations.
 
 ## To start
 
@@ -57,29 +51,8 @@ import MyAwesomeComponent from 'my-awesome-component'
 If you're using a hot-reload system, you should be able to observe any changes you make to your component (as long as you build them)
 
 ## To publish your component to npm
-Update the package.json with correct information.
-Important things to set:
 
-```json
-{
-  "name": "cool-beans",
-  "version": "4.2.0",
-  "description": "My wizzbang gizmo",
-  "author": "stevejobs",
-  "license": "ISC"
-}
-```
-
-If you have a git repo for the project, include the details:
-
-```json
-"repository": {
-    "type" : "git",
-    "url" : "https://github.com/zxol/react-component-publish"
-  },
-```
-
-Then, in the root directory, type:
+In the root directory, type:
 
 ```
 npm publish
