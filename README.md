@@ -2,6 +2,8 @@
 
 A dynamic UI library that allows you to build pages using drag and drop components and configurations.
 
+[Try it - Code Sandbox](https://codesandbox.io/s/dragd-template-joh6v3)
+
 ## To start
 
 ```
