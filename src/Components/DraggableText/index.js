@@ -43,7 +43,7 @@ function DraggableText(props) {
                             href="https://fonts.gstatic.com"
                         ></link>
                         <link
-                            href={`https://fonts.googleapis.com/css2?family=${elemData.style &&elemData.style.fontFamily
+                            href={`https://fonts.googleapis.com/css2?family=${elemData.style && elemData.style.fontFamily && elemData.style.fontFamily
                                 .split(' ')
                                 .join('+')}&display=swap`}
                             rel="stylesheet"

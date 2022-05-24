@@ -5,7 +5,7 @@ import DraggableText from './DraggableText';
 import DraggableImage from './DraggableImage';
 import DraggableDiv from './DraggableDiv';
 // const DraggableText = dynamic(() => import('./DraggableText'));
-import DraggableGiphy from './DraggableGiphy';
+// import DraggableGiphy from './DraggableGiphy';
 // const DraggableVideo = dynamic(() => import('./DraggableVideo'));
 // const DraggableAudio = dynamic(() => import('./DraggableAudio'));
 import DraggableButton from './DraggableButton';
@@ -44,13 +44,13 @@ function ComponentSelector({ elem, selected }) {
                     selected={isSelected}
                 />
             );
-        case 'giphy':
-            return (
-                <DraggableGiphy
-                    elemData={elem}
-                    selected={isSelected}
-                />
-            );
+        // case 'giphy':
+        //     return (
+        //         <DraggableGiphy
+        //             elemData={elem}
+        //             selected={isSelected}
+        //         />
+        //     );
         case 'color':
             return (
                 <DraggableDiv

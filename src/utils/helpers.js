@@ -31,7 +31,7 @@ export function getMobileScaleRatio() {
 }
 
 export function getElementOffset(element) {
-    var de = document.documentElement;
+    var de = typeof window !== "undefined" && document.documentElement;
     var box = element.getBoundingClientRect();
     var top = box.top + window.pageYOffset - de.clientTop;
     var left = box.left + window.pageXOffset - de.clientLeft;

@@ -70,12 +70,12 @@ function EditItem(props) {
                 movementType === movementTypes.ROTATING) &&
             prevMovementType !== movementType
         ) {
-            document.addEventListener('mousemove', onMouseMove);
-            document.addEventListener('mouseup', onMouseUp);
-            document.addEventListener('touchmove', onMouseMove, {
+            typeof window !== "undefined" && document.addEventListener('mousemove', onMouseMove);
+            typeof window !== "undefined" && document.addEventListener('mouseup', onMouseUp);
+            typeof window !== "undefined" && document.addEventListener('touchmove', onMouseMove, {
                 passive: false,
             });
-            document.addEventListener('touchend', onMouseUp);
+            typeof window !== "undefined" && document.addEventListener('touchend', onMouseUp);
         }
     }, [movementType]);
 
@@ -223,10 +223,10 @@ function EditItem(props) {
     function onMouseUp(e) {
         setMovementType(movementTypes.NOOP);
 
-        document.removeEventListener('mousemove', onMouseMove);
-        document.removeEventListener('mouseup', onMouseUp);
-        document.removeEventListener('touchmove', onMouseMove);
-        document.removeEventListener('touchend', onMouseUp);
+        typeof window !== "undefined" &&  document.removeEventListener('mousemove', onMouseMove);
+        typeof window !== "undefined" &&  document.removeEventListener('mouseup', onMouseUp);
+        typeof window !== "undefined" &&  document.removeEventListener('touchmove', onMouseMove);
+        typeof window !== "undefined" &&  document.removeEventListener('touchend', onMouseUp);
 
         e.stopPropagation();
         e.preventDefault();

@@ -440,7 +440,7 @@ Interthing Guide
   max-width: 100vw;
 } */
 
-.modal {
+.dragd-modal {
   position: fixed; /* Stay in place */
   z-index: 1; /* Sit on top */
   left: 0;
@@ -453,7 +453,7 @@ Interthing Guide
 }
 
 /* Modal Content/Box */
-.modal-content {
+.dragd-modal-content {
   background-color: #fefefe;
   margin: 15% auto; /* 15% from the top and centered */
   padding: 20px;

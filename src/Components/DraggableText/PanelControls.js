@@ -75,7 +75,7 @@ export default function PanelControls({
             <div style={{ padding: 2 }} />
             <DropDownMenu
                 options={[14, 18, 20, 24, 30, 36, 48, 72, 90]}
-                selectedOption={elemData.style && elemData.style.fontSize.replace(/[^0-9]/g, '')}
+                selectedOption={elemData.style &&  elemData.style.fontSize && elemData.style.fontSize.replace(/[^0-9]/g, '')}
                 onSelect={(selectedValue) => {
                     onLocalUpdate({ style: {fontSize: selectedValue + 'px' }});
                 }}

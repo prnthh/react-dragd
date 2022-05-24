@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Input } from '../../utils/helpers';
 import ColorPicker from '../../utils/ui/ColorPicker';
 import SiteContext from '../../pageContext';

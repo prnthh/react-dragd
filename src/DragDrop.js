@@ -28,7 +28,7 @@ function DragDrop({
 
   const [pageHeight, setPageHeight] = useState(0);
   const [pageWidth, setPageWidth] = useState(0);
-    console.log('rendering dragdrop');
+
   function deleteItemFromList(key) {
     var newItems = items;
     newItems[key] && delete newItems[key];
@@ -137,7 +137,7 @@ function DragDrop({
                             transform:
                             pageWidth
                                     ? `translateX(${
-                                          document.body.clientWidth / 2
+                                        typeof window !== "undefined" && window.innerWidth / 2
                                       }px)`
                                     : `translateX(50%)`,
                         }}
@@ -164,14 +164,14 @@ function DragDrop({
           </div>
           </div>
 
-            {modal && (
+            {modal && <>
                 <GenericModal
                     content={modal}
                     onDone={() => {
                         setModal(null);
                     }}
                 />
-            )}
+            </>}
 
 
 

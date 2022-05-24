@@ -23,7 +23,7 @@ function DraggableImage(props) {
         var img = new Image();
         img.crossOrigin = 'Anonymous';
         img.onload = function () {
-            var canvas = document.createElement('CANVAS');
+            var canvas = typeof window !== "undefined" && document.createElement('CANVAS');
             // @ts-expect-error TODO: getContext exists on canvas, investigate
             var ctx = canvas.getContext('2d');
             var dataURL;

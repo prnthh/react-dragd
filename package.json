@@ -1,6 +1,6 @@
 {
   "name": "react-dragd",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Drag-and-drop page builder and viewer for React.",
   "main": "build/index.js",
   "scripts": {
@@ -8,7 +8,7 @@
     "build": "webpack --env publish --mode production",
     "dev": "webpack-dev-server --env testServer --mode development --open"
   },
-  "author": "zxol",
+  "author": "prnth.com",
   "license": "ISC",
   "repository": {
     "type": "git",
@@ -32,6 +32,7 @@
     "@babel/preset-react": "^7.0.0",
     "babel-loader": "^8.0.6",
     "css-loader": "^5.2.7",
+    "mini-css-extract-plugin": "^0.9.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "style-loader": "^2.0.0",
