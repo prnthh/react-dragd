@@ -7,8 +7,7 @@ export default function DropDownMenu({ options, selectedOption, onSelect, type }
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div class="dropdown is-active" >
-                <div class="dropdown-trigger">
+            <div class="dropdown" >
                     <button
                         class="button"
                         aria-haspopup="true"
@@ -27,9 +26,8 @@ export default function DropDownMenu({ options, selectedOption, onSelect, type }
                             <i class="fas fa-angle-down" aria-hidden="true"></i>
                         </span>
                     </button>
-                </div>
                 {selected && (
-                    <div class="dropdown-menu" id="dropdown-menu" role="menu" onBlur={()=>{ setSelected(false)}}>
+                    <div class="dropdown-content" id="dropdown-menu" role="menu" onBlur={()=>{ setSelected(false)}}>
                         <div ref={listInnerRef} class="dropdown-content" style={{maxHeight: '400px', overflowY: 'scroll'}}
                             onScroll={() => {
                                 if (listInnerRef.current) {
@@ -41,7 +39,7 @@ export default function DropDownMenu({ options, selectedOption, onSelect, type }
                               }}>
                             {options.slice(0,scrollLimit).map((elem) => {
                                 return (
-                                    <a
+                                    <><a
                                         href="#"
                                         onClick={(e) => {
                                             onSelect(elem);
@@ -60,7 +58,7 @@ export default function DropDownMenu({ options, selectedOption, onSelect, type }
                                         </>}
                                         
                                         {elem}
-                                    </a>
+                                    </a><br/></>
                                 );
                             })}
                             {/* <hr class="dropdown-divider" /> */}

@@ -125,6 +125,19 @@ const defaultButtons = {
         selector: 'giphy',
         label: 'Add Sticker',
     },
+    code2: {
+        icon: 'fas fa-code',
+        label: 'Add Code',
+        action: 'add',
+        object: {
+            type: 'crypto',
+            size: {
+                width: 100,
+                height: 100,
+            },
+            text: 'Add your code here!',
+        },
+    },
     code: {
         icon: 'fas fa-code',
         label: 'Add Code',

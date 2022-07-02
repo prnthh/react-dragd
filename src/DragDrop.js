@@ -122,6 +122,8 @@ function DragDrop({
     <div
                 style={{
                     width: '100vw',
+                    maxWidth: '100vw',
+                    overflow: 'hidden',
                     minHeight: '100vh',
                     height: pageWidth ? (pageHeight * getMobileScaleRatio()) : undefined,
                 }}

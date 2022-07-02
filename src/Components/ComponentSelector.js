@@ -5,11 +5,12 @@ import DraggableText from './DraggableText';
 import DraggableImage from './DraggableImage';
 import DraggableDiv from './DraggableDiv';
 // const DraggableText = dynamic(() => import('./DraggableText'));
-// import DraggableGiphy from './DraggableGiphy';
+import DraggableGiphy from './DraggableGiphy';
 // const DraggableVideo = dynamic(() => import('./DraggableVideo'));
 // const DraggableAudio = dynamic(() => import('./DraggableAudio'));
 import DraggableButton from './DraggableButton';
 import DraggableHtml from './DraggableHtml';
+import DraggableCrypto from './DraggableCrypto';
 // const DraggableForm = dynamic(() => import('./DraggableForm'));
 // const DraggableTemplate = dynamic(() => import('./DraggableTemplate'));
 // const NextHead = dynamic(() => import('./NextHead.js'));
@@ -44,13 +45,20 @@ function ComponentSelector({ elem, selected }) {
                     selected={isSelected}
                 />
             );
-        // case 'giphy':
-        //     return (
-        //         <DraggableGiphy
-        //             elemData={elem}
-        //             selected={isSelected}
-        //         />
-        //     );
+        case 'crypto':
+            return (
+                <DraggableCrypto
+                    elemData={elem}
+                    selected={isSelected}
+                />
+            );
+        case 'giphy':
+            return (
+                <DraggableGiphy
+                    elemData={elem}
+                    selected={isSelected}
+                />
+            );
         case 'color':
             return (
                 <DraggableDiv
