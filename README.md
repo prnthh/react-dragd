@@ -4,6 +4,26 @@ A dynamic UI library that allows you to build pages using drag and drop componen
 
 [Try it - Code Sandbox](https://codesandbox.io/s/dragd-template-joh6v3)
 
+## Installation and Usage
+Install the package from NPM
+```
+npm i react-dragd
+```
+
+Import the package and CSS in your react project.
+```
+import Dragd from "react-dragd";
+import "../node_modules/react-dragd/build/main.css";
+
+export default function App() {
+  return (
+    <div className="App">
+      <Dragd />
+    </div>
+  );
+}
+```
+
 ## To start
 
 ```
