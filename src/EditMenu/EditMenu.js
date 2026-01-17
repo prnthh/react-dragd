@@ -1,39 +1,36 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Column, Row } from '../utils/helpers';
-import defaultButtons from './defaultButtons';
+import { getRegisteredButtons, getAllComponents } from '../Components/registry';
 import { v4 as uuidv4 } from 'uuid';
-import { GiphySelector } from '../Components/DraggableGiphy/GiphySelector';
-// import { HeadConfigurator } from '../NextHead';
-import { ButtonSelector } from '../Components/DraggableButton/ButtonSelector';
 import SiteContext from '../pageContext';
-// import { TemplateSelector } from '../DraggableTemplate';
+import { styles, mergeStyles } from '../styles';
 
 export function AddButton({ item, showMenu, setSelector }) {
     const siteData = useContext(SiteContext);
 
-    const SELECTORS = {
-        giphy: <GiphySelector addItemToList={siteData.addItemToList} />,
-        // headconf: <HeadConfigurator addItemToList={siteData.addItemToList} />,
+    // Get selectors dynamically from registered components
+    const getModalSelector = (selectorName) => {
+        const components = getAllComponents();
+        const component = components[selectorName];
+        if (component && component.Selector) {
+            const SelectorComponent = component.Selector;
+            return (
+                <SelectorComponent
+                    addItemToList={siteData.addItemToList}
+                    close={() => siteData.setModal(null)}
+                />
+            );
+        }
+        return null;
     };
 
-    const FUNCS = {
-        button: (
-            <ButtonSelector
-                addItemToList={siteData.addItemToList}
-                close={() => siteData.setModal(null)}
-            />
-        ),
-        // template: (
-        //     <TemplateSelector
-        //         addItemToList={siteData.addItemToList}
-        //         close={() => siteData.setModal(null)}
-        //     />
-        // ),
-    };
+    const [isHovered, setIsHovered] = useState(false);
 
     return (
         <div
-            className={'cbutton tooltip'}
+            style={mergeStyles(styles.cbutton, styles.tooltip)}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
             onClick={(e) => {
                 switch (item[1].action) {
                     case 'add':
@@ -43,18 +40,21 @@ export function AddButton({ item, showMenu, setSelector }) {
                     case 'menu':
                         showMenu(item[1].objects);
                         break;
-                    case 'selector':
-                        setSelector(SELECTORS[item[1].selector]);
-                        break;
                     case 'modal':
-                        siteData.setModal(FUNCS[item[1].selector]);
+                        const modalContent = getModalSelector(item[1].selector);
+                        if (modalContent) {
+                            siteData.setModal(modalContent);
+                        }
                         break;
                 }
                 e.stopPropagation();
             }}
         >
             {item[1].label && (
-                <span className="tooltiptext">{item[1].label}</span>
+                <span style={mergeStyles(
+                    styles.tooltiptext,
+                    isHovered && styles.tooltiptextVisible
+                )}>{item[1].label}</span>
             )}
 
             <i className={`${item[1].icon}`}></i>
@@ -64,17 +64,18 @@ export function AddButton({ item, showMenu, setSelector }) {
 
 function Menu({ addItemToList, selected }) {
     const siteData = useContext(SiteContext);
+    const buttons = getRegisteredButtons();
 
     return (
         <div
-            className={'cpanel'}
+            style={styles.cpanel}
             onClick={(e) => {
                 e.stopPropagation();
             }}
         >
             <Row>
                 <NestedMenu
-                    data={defaultButtons}
+                    data={buttons}
                     addItemToList={siteData.addItemToList}
                     parentSelected={selected}
                 />
@@ -98,8 +99,7 @@ function NestedMenu({ data, addItemToList, parentSelected }) {
 
     return (
         <>
-            {selector && <Column className={'cpanel-col'}>{selector}</Column>}
-            {/* todo make this truly recursive by adding editmenu again */}
+            {selector && <Column style={{ borderRight: '1px solid black' }}>{selector}</Column>}
             {selected != null && (
                 <NestedMenu
                     data={selected}
@@ -107,7 +107,7 @@ function NestedMenu({ data, addItemToList, parentSelected }) {
                     parentSelected={selected}
                 />
             )}
-            <Column className={'cpanel-col cpanel-col-buttons'}>
+            <Column style={{ borderRight: '1px solid black' }}>
                 {Object.entries(data).map((item) => {
                     return (
                         <AddButton

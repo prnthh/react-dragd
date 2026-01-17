@@ -1,13 +1,28 @@
 {
   "name": "react-dragd",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Drag-and-drop page builder and viewer for React.",
-  "main": "build/index.js",
-  "scripts": {
-    "start": "webpack --env publish --mode production --watch",
-    "build": "webpack --env publish --mode production",
-    "dev": "webpack-dev-server --env testServer --mode development --open"
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
   },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "concurrently \"tsup --watch\" \"cd docs && npm run dev\"",
+    "prepublishOnly": "npm run build"
+  },
+  "workspaces": [
+    "docs"
+  ],
   "author": "prnth.com",
   "license": "ISC",
   "repository": {
@@ -15,29 +30,23 @@
     "url": "https://github.com/prnthh/react-dragd"
   },
   "peerDependencies": {
-    "react": "^16.7.0"
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
   },
   "dependencies": {
-    "@giphy/js-fetch-api": "^4.1.2",
-    "@giphy/react-components": "^5.7.0",
-    "@monaco-editor/react": "^4.4.5",
-    "react-colorful": "^5.5.1",
-    "react-giphy-searchbox": "^1.5.4",
-    "react-markdown": "^8.0.3",
-    "rehype-raw": "^6.1.1"
+    "@monaco-editor/react": "^4.7.0",
+    "react-colorful": "^5.6.1",
+    "react-markdown": "^10.1.0",
+    "rehype-raw": "^7.0.0",
+    "uuid": "^11.0.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.4.5",
-    "@babel/preset-env": "^7.4.5",
-    "@babel/preset-react": "^7.0.0",
-    "babel-loader": "^8.0.6",
-    "css-loader": "^5.2.7",
-    "mini-css-extract-plugin": "^0.9.0",
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6",
-    "style-loader": "^2.0.0",
-    "webpack": "^4.33.0",
-    "webpack-cli": "^3.3.3",
-    "webpack-dev-server": "^3.7.1"
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "concurrently": "^9.2.1",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "tsup": "^8.0.0",
+    "typescript": "^5.7.0"
   }
 }

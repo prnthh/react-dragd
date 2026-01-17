@@ -1,3 +1,5 @@
+import { styles, mergeStyles } from '../../styles';
+
 export default function MobileBoundary ({mobileWidth = 600}) {
     return window.innerWidth > mobileWidth && <>
         <Boundary mobileWidth={mobileWidth} />
@@ -8,22 +10,20 @@ export default function MobileBoundary ({mobileWidth = 600}) {
 function Boundary({mobileWidth, right}) {
     return <>
     <div
-        className={'mobile-align-bg'}
-        style={{
+        style={mergeStyles(styles.mobileAlignBg, {
             position: 'fixed',
             left: right? undefined: `0px`,
             right: right? `0px`: undefined,
             width: `calc((100vw - ${mobileWidth}px)/2)`,
             height: '100vh',
-        }}
+        })}
     >
         <div
-            className={'page-align-guide mobile-align-guide active'}
-            style={{
+            style={mergeStyles(styles.pageAlignGuide, styles.mobileAlignGuide, {
                 position: "absolute",
                 right: right? undefined: "0px",
                 left: right? "0px": undefined,
-            }}
+            })}
         />
         <div
             style={{

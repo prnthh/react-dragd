@@ -1,11 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import EditItem from './DDEditor/EditItem';
+import SiteContext from '../pageContext';
+import ReactMarkdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
 import Editor from '@monaco-editor/react';
+import { styles, mergeStyles } from '../styles';
+import { registerComponent } from './registry';
 
-export default function PanelControls({ onLocalUpdate, elemData, setModal }) {
+function PanelControls({ onLocalUpdate, elemData, setModal }) {
     function CodeEditor() {
         const [fileType, setFileType] = useState(elemData.subtype || 'md');
-        const [html, setHtml] = useState('');
-        const [js, setJs] = useState('');
 
         const languages = { md: 'markdown', html: 'html', js: 'javascript' };
 
@@ -24,7 +28,6 @@ export default function PanelControls({ onLocalUpdate, elemData, setModal }) {
                             {fileType !== 'md' && (
                                 <>
                                     <button
-                                        className={'button'}
                                         disabled={fileType === 'html'}
                                         onClick={() => {
                                             setFileType('html');
@@ -36,7 +39,6 @@ export default function PanelControls({ onLocalUpdate, elemData, setModal }) {
                                     <span style={{ marginLeft: '10px' }} />
 
                                     <button
-                                        className={'button'}
                                         disabled={fileType === 'js'}
                                         onClick={() => {
                                             setFileType('js');
@@ -48,7 +50,6 @@ export default function PanelControls({ onLocalUpdate, elemData, setModal }) {
                             )}
                             {fileType === 'md' && (
                                 <button
-                                    className={'button'}
                                     disabled={fileType === 'md'}
                                     onClick={() => {
                                         setFileType('md');
@@ -59,31 +60,18 @@ export default function PanelControls({ onLocalUpdate, elemData, setModal }) {
                             )}
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'row' }}>
-                            <div className="select">
-                                <select
-                                    defaultValue={fileType}
-                                    onChange={(e) => {
-                                        setFileType(e.currentTarget.value);
-                                        onLocalUpdate({
-                                            subtype: e.currentTarget.value,
-                                        });
-                                        if (e.currentTarget.value === 'md') {
-                                            // analytics.track(
-                                            //     'editor_markdown_selected',
-                                            // );
-                                        } else if (
-                                            e.currentTarget.value === 'html'
-                                        ) {
-                                            // analytics.track(
-                                            //     'editor_html_selected',
-                                            // );
-                                        }
-                                    }}
-                                >
-                                    <option value={'md'}>Markdown</option>
-                                    <option value={'html'}>HTML + JS</option>
-                                </select>
-                            </div>
+                            <select
+                                defaultValue={fileType}
+                                onChange={(e) => {
+                                    setFileType(e.currentTarget.value);
+                                    onLocalUpdate({
+                                        subtype: e.currentTarget.value,
+                                    });
+                                }}
+                            >
+                                <option value={'md'}>Markdown</option>
+                                <option value={'html'}>HTML + JS</option>
+                            </select>
                             <span style={{ marginLeft: '10px' }} />
                             <div
                                 style={{
@@ -140,7 +128,6 @@ export default function PanelControls({ onLocalUpdate, elemData, setModal }) {
                         <CodeEditor
                             prefill={elemData.href}
                             onComplete={(data) => {
-                                // saveElemJson({ href: data });
                                 setModal(null);
                             }}
                         />,
@@ -152,7 +139,7 @@ export default function PanelControls({ onLocalUpdate, elemData, setModal }) {
 
             <div style={{ padding: 5 }} />
             <div
-                className={'cbutton cbuttoninner'}
+                style={mergeStyles(styles.cbutton, styles.cbuttoninner)}
                 onClick={() => {
                     onLocalUpdate({ maxWidth: !elemData.maxWidth });
                 }}
@@ -162,3 +149,64 @@ export default function PanelControls({ onLocalUpdate, elemData, setModal }) {
         </>
     );
 }
+
+function DraggableHtml(props) {
+    const { elemData, selected } = props;
+
+    const siteData = useContext(SiteContext);
+    const { setSelected: onSelect, onUpdateDiv: onUpdated, mode } = siteData;
+
+    function onLocalUpdate(newProps) {
+        var updatedProps = {
+            ...newProps,
+        };
+        siteData.onUpdateDiv(elemData.id, updatedProps);
+    }
+
+    return (
+        <>
+            <EditItem
+                elemData={elemData}
+                onSelect={onSelect}
+                onUpdated={onUpdated}
+                selected={selected}
+                onLocalUpdate={onLocalUpdate}
+                renderPanel={selected && PanelControls}
+                mode={mode}
+            >
+                {elemData.subtype == 'html' && (
+                    <div
+                        dangerouslySetInnerHTML={{ __html: elemData.text }}
+                    ></div>
+                )}
+                {elemData.subtype == 'md' && (
+                    <div>
+                        <ReactMarkdown
+                            rehypePlugins={[rehypeRaw]}
+                            children={elemData.text}
+                            allowDangerousHtml
+                        />
+                    </div>
+                )}
+            </EditItem>
+        </>
+    );
+}
+
+// Register this component for multiple types
+registerComponent({
+    type: ['markdown', 'code'],
+    Component: DraggableHtml,
+    button: {
+        icon: 'fas fa-code',
+        label: 'Add HTML/Markdown',
+        action: 'add',
+        object: {
+            type: 'code',
+            size: { width: 100, height: 100 },
+            text: 'Add your code here!',
+        },
+    },
+});
+
+export default DraggableHtml;

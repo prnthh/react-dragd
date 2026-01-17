@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react';
 import EditItem from './DDEditor/EditItem';
 import ColorPicker from '../utils/ui/ColorPicker';
 import SiteContext from '../pageContext';
+import { registerComponent } from './registry';
 
 function DraggableImage(props) {
     const { elemData, selected } = props;
@@ -138,5 +139,38 @@ function DraggableImage(props) {
         </>
     );
 }
+
+// Register this component
+registerComponent({
+    type: 'color',
+    Component: DraggableImage,
+    button: {
+        icon: 'fas fa-shapes',
+        label: 'Add Shape',
+        action: 'menu',
+        objects: {
+            square: {
+                icon: 'fas fa-square-full',
+                label: 'Rectangle',
+                action: 'add',
+                object: {
+                    type: 'color',
+                    size: { width: 100, height: 100 },
+                    style: { backgroundColor: 'grey' },
+                },
+            },
+            circle: {
+                icon: 'fas fa-circle',
+                label: 'Circle',
+                action: 'add',
+                object: {
+                    type: 'color',
+                    size: { width: 100, height: 100 },
+                    style: { backgroundColor: 'blue', borderRadius: 9999999 },
+                },
+            },
+        },
+    },
+});
 
 export default DraggableImage;

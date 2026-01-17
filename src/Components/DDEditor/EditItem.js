@@ -13,6 +13,7 @@ import {
 import SiteContext from '../../pageContext';
 import ControlPanel from '../../EditMenu/ControlPanel';
 import DragCoincideLines from './dragCoincideLines';
+import { styles } from '../../styles';
 // const ControlPanel = dynamic(() => import('../EditMenu/ControlPanel'));
 // const DragCoincideLines = dynamic(() => import('./dragCoincideLines.js'));
 
@@ -39,6 +40,7 @@ function EditItem(props) {
     const {
         setSelected: onSelect,
         onUpdateDiv: onUpdated,
+        onUpdateItemsBulk,
         mode,
         setModal,
     } = siteData;
@@ -83,21 +85,43 @@ function EditItem(props) {
     function onMouseDown(e) {
         // only left mouse button
         if (mode != 'edit') return;
-        var pos = getElementOffset(divRef.current);
 
         var startX = e.pageX ? e.pageX : e.changedTouches[0].pageX;
         var startY = e.pageY ? e.pageY : e.changedTouches[0].pageY;
 
+        // Use elemData.pos directly - anchor is top center
+        var anchorX = elemData.pos.x * getMobileScaleRatio() + x;
+        var anchorY = elemData.pos.y * getMobileScaleRatio();
+
         var newState = {
             rel: {
-                x: startX - pos.left - pos.width / 2,
-                y: startY - pos.top - pos.height / 2,
-                startX: pos.left,
-                startY: pos.top,
+                x: startX - anchorX,
+                y: startY - anchorY,
+            },
+            dragStart: {
+                x: elemData.pos.x,
+                y: elemData.pos.y,
             },
         };
+
+        const selectedIds = Array.isArray(siteData.selected)
+            ? siteData.selected.filter((id) => siteData.items && siteData.items[id])
+            : [];
+
+        if (!(selectedIds.includes(elemData.id) && selectedIds.length > 1)) {
+            onSelect(elemData.id);
+        }
+
+        if (selectedIds.length > 1) {
+            newState.dragStartPositions = selectedIds.reduce((acc, id) => {
+                acc[id] = {
+                    x: siteData.items[id].pos.x,
+                    y: siteData.items[id].pos.y,
+                };
+                return acc;
+            }, {});
+        }
         setState(newState);
-        onSelect(elemData.id);
 
         if (isMobile() && !selected) {
             return;
@@ -186,7 +210,24 @@ function EditItem(props) {
                     y: (clientY - state.rel.y) * (1 / getMobileScaleRatio()),
                 },
             };
-            saveElemJson(SnapToGrid(toPosition));
+            const snapped = SnapToGrid(toPosition);
+            const dragStartPositions = state.dragStartPositions;
+            if (dragStartPositions && onUpdateItemsBulk) {
+                const deltaX = snapped.pos.x - state.dragStart.x;
+                const deltaY = snapped.pos.y - state.dragStart.y;
+                const updates = {};
+                Object.keys(dragStartPositions).forEach((id) => {
+                    updates[id] = {
+                        pos: {
+                            x: dragStartPositions[id].x + deltaX,
+                            y: dragStartPositions[id].y + deltaY,
+                        },
+                    };
+                });
+                onUpdateItemsBulk(updates);
+            } else {
+                saveElemJson(snapped);
+            }
         } else if (movementType == movementTypes.ROTATING) {
             const rotateVector = {
                 x: clientX - state.rot.center.x,
@@ -234,33 +275,10 @@ function EditItem(props) {
 
     return (
         <>
-            {/* SECTION: ALIGNMENT GRIDS */}
-            {selected && (
-                <DragCoincideLines
-                    elemData={elemData}
-                    dragging={movementType == movementTypes.DRAGGING}
-                    coincides={coincides}
-                />
-            )}
-
-            {/* SECTION: CONTROL PANEL */}
-            {selected && (
-                <>
-                    <ControlPanel
-                        elemData={elemData}
-                        saveElemJson={saveElemJson}
-                        setModal={setModal}
-                        CustomPanel={props.renderPanel}
-                        onLocalUpdate={props.onLocalUpdate}
-                    ></ControlPanel>
-                </>
-            )}
-
             {/* SECTION: DRAGGABLE RECT */}
             {mode == 'edit' ? (
                 <Rect
                     ref={divRef}
-                    className={mode == 'edit' ? 'draggable' : ''}
                     elemData={elemData}
                     selected={selected}
                     onMouseDownDrag={onMouseDown}
@@ -286,6 +304,26 @@ function EditItem(props) {
                     <Rect elemData={elemData}>{props.children}</Rect>
                 </LinkWrapper>
             )}
+
+            {/* SECTION: ALIGNMENT GRIDS */}
+            {selected && (
+                <DragCoincideLines
+                    elemData={elemData}
+                    dragging={movementType == movementTypes.DRAGGING}
+                    coincides={coincides}
+                />
+            )}
+
+            {/* SECTION: CONTROL PANEL */}
+            {selected && (
+                <ControlPanel
+                    elemData={elemData}
+                    saveElemJson={saveElemJson}
+                    setModal={setModal}
+                    CustomPanel={props.renderPanel}
+                    onLocalUpdate={props.onLocalUpdate}
+                />
+            )}
         </>
     );
 }
@@ -297,6 +335,8 @@ const Rect = React.forwardRef((props, ref) => {
         onMouseDownDrag,
         onMouseDownRes,
         onMouseDownRot,
+        children,
+        ...rest
     } = props;
     const { pos, size, rot, zIndex } = elemData;
     var x = typeof window !== 'undefined' ? window.innerWidth / 2 : 200;
@@ -307,13 +347,15 @@ const Rect = React.forwardRef((props, ref) => {
                 e.stopPropagation();
             }}
             ref={ref}
+            data-dd-item="true"
+            data-dd-id={elemData.id}
             onMouseDown={onMouseDownDrag}
             onTouchStart={onMouseDownDrag}
             key={elemData.id + '-rect'}
             style={{
                 zIndex: zIndex,
                 position: 'absolute',
-                transform: `translate(-50%, -50%) ${
+                transform: `translate(-50%, 0) ${
                     rot && rot.deg ? `rotate(${rot.deg}deg)` : ``
                 }`,
                 left: pos.x + 'px',
@@ -322,7 +364,6 @@ const Rect = React.forwardRef((props, ref) => {
                 height: (size.height || 50) + 'px',
                 textAlign: 'center',
             }}
-            {...props}
         >
             <div
                 style={{
@@ -334,7 +375,7 @@ const Rect = React.forwardRef((props, ref) => {
                         : '1px solid transparent',
                 }}
             >
-                {props.children}
+                {children}
             </div>
 
             {/* RESIZE AND ROTATE HANDLES */}
@@ -344,8 +385,8 @@ const Rect = React.forwardRef((props, ref) => {
                         <div
                             onMouseDown={onMouseDownRot}
                             onTouchStart={onMouseDownRot}
-                            className={'dragHandle'}
                             style={{
+                                ...styles.dragHandle,
                                 top: elemData.size.height + 20,
                                 left: elemData.size.width / 2,
                             }}
@@ -360,8 +401,7 @@ const Rect = React.forwardRef((props, ref) => {
                                 key={'rot-' + id}
                                 onMouseDown={onMouseDownRes}
                                 onTouchStart={onMouseDownRes}
-                                className={'dragHandle'}
-                                style={{ ...elem }}
+                                style={{ ...styles.dragHandle, ...elem }}
                             />
                         );
                     })}

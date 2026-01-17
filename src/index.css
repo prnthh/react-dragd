@@ -139,9 +139,6 @@
 } */
 
 /* Tooltip container */
-.tooltip {
-}
-
 .tooltip .tooltiptext {
   visibility: hidden;
   width: 120px;

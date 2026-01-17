@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, {useState, useEffect, useCallback, useRef} from 'react';
 import GenericModal from './utils/ui/GenericModal';
 import { Column, debounce, getMobileScaleRatio, guidGenerator, mergeDeep } from './utils/helpers';
 import SiteContext from './pageContext';
@@ -29,6 +29,18 @@ function DragDrop({
   const [pageHeight, setPageHeight] = useState(0);
   const [pageWidth, setPageWidth] = useState(0);
 
+    const selectionRef = useRef({
+        active: false,
+        startX: 0,
+        startY: 0,
+        currentX: 0,
+        currentY: 0,
+        justSelected: false,
+        baseSelection: [],
+        shiftKey: false,
+    });
+    const [selectionBox, setSelectionBox] = useState(null);
+
   function deleteItemFromList(key) {
     var newItems = items;
     newItems[key] && delete newItems[key];
@@ -47,6 +59,20 @@ function DragDrop({
     setItems(updatedItems);
 }
 
+    function onUpdateItemsBulk(itemUpdates) {
+        if (!itemUpdates || Object.keys(itemUpdates).length === 0) return;
+        const updatedItems = { ...items };
+        Object.keys(itemUpdates).forEach((id) => {
+            if (!updatedItems[id]) return;
+            updatedItems[id] = {
+                ...updatedItems[id],
+                ...mergeDeep(updatedItems[id], itemUpdates[id]),
+            };
+        });
+        setItems(updatedItems);
+        debounceElemdataHistoryUpdate(pastItems, updatedItems, undoCount);
+    }
+
   function undo(e) {
     setItems(pastItems[pastItems.length - 1 - (undoCount + 1)]);
     setUndoCount(undoCount + 1);
@@ -60,7 +86,6 @@ function DragDrop({
 
       e.stopPropagation();
   }
-
   function onSaveClicked() {
       if (!immutable) {
           setMode(EditorModes.VIEW);
@@ -85,7 +110,7 @@ function DragDrop({
     setItems(updatedItems);
     debounceElemdataHistoryUpdate(pastItems, updatedItems, undoCount);
     setSelected([newItem.id]);
-}
+  }
 
   const debounceElemdataHistoryUpdate = useCallback(
     debounce((oldItemsList, newItem, undoCount) => {
@@ -105,15 +130,142 @@ function DragDrop({
     items: items,
     selected: selected,
     setSelected: (item) => {
+        if (Array.isArray(item)) {
+            setSelected(item);
+            return;
+        }
         setSelected([item]);
-        // setSelected([...selected, item])
     },
     deleteItemFromList: deleteItemFromList,
     addItemToList: addItemToList,
     onUpdateDiv: onUpdateDiv,
+    onUpdateItemsBulk: onUpdateItemsBulk,
     mode: mode,
     setModal: setModal,
   };
+
+    function getPointerPosition(e) {
+        const point = e.touches && e.touches.length ? e.touches[0] : e;
+        return { x: point.clientX, y: point.clientY };
+    }
+
+    function getSelectionRect() {
+        const { startX, startY, currentX, currentY } = selectionRef.current;
+        const left = Math.min(startX, currentX);
+        const top = Math.min(startY, currentY);
+        const width = Math.abs(currentX - startX);
+        const height = Math.abs(currentY - startY);
+        return { left, top, width, height, right: left + width, bottom: top + height };
+    }
+
+    function rectsIntersect(a, b) {
+        return !(b.left > a.right ||
+            b.right < a.left ||
+            b.top > a.bottom ||
+            b.bottom < a.top);
+    }
+
+    function handleSelectionStart(e) {
+        if (mode !== EditorModes.EDIT) return;
+        if (e.button !== undefined && e.button !== 0) return;
+        if (e.target && e.target.closest && e.target.closest('[data-dd-item="true"]')) return;
+
+        const { x, y } = getPointerPosition(e);
+        const shiftKey = !!e.shiftKey;
+        const baseSelection = shiftKey ? selected.slice() : [];
+        selectionRef.current = {
+            active: true,
+            startX: x,
+            startY: y,
+            currentX: x,
+            currentY: y,
+            justSelected: false,
+            baseSelection,
+            shiftKey,
+        };
+        setSelectionBox({ left: x, top: y, width: 0, height: 0 });
+
+        const moveListener = (ev) => {
+            if (!selectionRef.current.active) return;
+            const pos = getPointerPosition(ev);
+            selectionRef.current.currentX = pos.x;
+            selectionRef.current.currentY = pos.y;
+            const rect = getSelectionRect();
+            setSelectionBox({ left: rect.left, top: rect.top, width: rect.width, height: rect.height });
+            if (rect.width > 2 && rect.height > 2) {
+                const nodes = typeof document !== 'undefined'
+                    ? document.querySelectorAll('[data-dd-item="true"]')
+                    : [];
+                const hoveredIds = [];
+                nodes.forEach((node) => {
+                    const bounds = node.getBoundingClientRect();
+                    const nodeRect = {
+                        left: bounds.left,
+                        right: bounds.right,
+                        top: bounds.top,
+                        bottom: bounds.bottom,
+                    };
+                    if (rectsIntersect(rect, nodeRect)) {
+                        const id = node.getAttribute('data-dd-id');
+                        if (id) hoveredIds.push(id);
+                    }
+                });
+                const nextSelection = selectionRef.current.shiftKey
+                    ? Array.from(new Set([...selectionRef.current.baseSelection, ...hoveredIds]))
+                    : hoveredIds;
+                setSelected(nextSelection);
+            }
+            ev.preventDefault();
+        };
+
+        const upListener = (ev) => {
+            if (!selectionRef.current.active) return;
+            selectionRef.current.active = false;
+            const rect = getSelectionRect();
+            const selectedIds = [];
+            if (rect.width > 2 && rect.height > 2) {
+                const nodes = typeof document !== 'undefined'
+                    ? document.querySelectorAll('[data-dd-item="true"]')
+                    : [];
+                nodes.forEach((node) => {
+                    const bounds = node.getBoundingClientRect();
+                    const nodeRect = {
+                        left: bounds.left,
+                        right: bounds.right,
+                        top: bounds.top,
+                        bottom: bounds.bottom,
+                    };
+                    if (rectsIntersect(rect, nodeRect)) {
+                        const id = node.getAttribute('data-dd-id');
+                        if (id) selectedIds.push(id);
+                    }
+                });
+            }
+
+            const finalSelection = selectionRef.current.shiftKey
+                ? Array.from(new Set([...selectionRef.current.baseSelection, ...selectedIds]))
+                : selectedIds;
+            setSelected(finalSelection);
+            if (selectedIds.length > 0) {
+                selectionRef.current.justSelected = true;
+            }
+            setSelectionBox(null);
+
+            typeof window !== 'undefined' && window.removeEventListener('mousemove', moveListener);
+            typeof window !== 'undefined' && window.removeEventListener('mouseup', upListener);
+            typeof window !== 'undefined' && window.removeEventListener('touchmove', moveListener);
+            typeof window !== 'undefined' && window.removeEventListener('touchend', upListener);
+
+            ev.preventDefault();
+        };
+
+        typeof window !== 'undefined' && window.addEventListener('mousemove', moveListener);
+        typeof window !== 'undefined' && window.addEventListener('mouseup', upListener);
+        typeof window !== 'undefined' && window.addEventListener('touchmove', moveListener, { passive: false });
+        typeof window !== 'undefined' && window.addEventListener('touchend', upListener);
+
+        e.preventDefault();
+    }
 
   return (
     <>
@@ -121,18 +273,44 @@ function DragDrop({
     <SiteContext.Provider value={providerValues}>
     <div
                 style={{
-                    width: '100vw',
-                    maxWidth: '100vw',
+                    position: 'relative',
+                    width: '100%',
+                    maxWidth: '100%',
                     overflow: 'hidden',
                     minHeight: '100vh',
                     height: pageWidth ? (pageHeight * getMobileScaleRatio()) : undefined,
                 }}
+                onMouseDown={handleSelectionStart}
+                onTouchStart={handleSelectionStart}
                 onClick={(e) => {
-                    console.log('bg got clicked now');
-                    setSelected(['bg']);
-                    console.log(e);
+                    if (e.target && e.target.closest && e.target.closest('[data-dd-item="true"]')) return;
+                    if (selectionRef.current.justSelected) {
+                        selectionRef.current.justSelected = false;
+                        return;
+                    }
+                    if (!e.shiftKey) {
+                        setSelected([]);
+                    }
                 }}
             >
+                {selectionBox && (
+                    <div
+                        style={{
+                            position: 'fixed',
+                            left: selectionBox.left,
+                            top: selectionBox.top,
+                            width: selectionBox.width,
+                            height: selectionBox.height,
+                            border: '1px dashed #4a90e2',
+                            background: 'rgba(74, 144, 226, 0.15)',
+                            zIndex: 999998,
+                            pointerEvents: 'none',
+                        }}
+                    />
+                )}
+                {mode == EditorModes.EDIT && selected[0] && selected[0].length > 20 && (
+                    <MobileBoundary />
+                )}
                 <div style={{ transform:`scale(${pageWidth? getMobileScaleRatio(): 1})` }}>
                     <div
                         style={{
@@ -147,11 +325,11 @@ function DragDrop({
           {Object.keys(items).map((key) => {
               var elem = items[key];
               if (
-                  elem.pos.y + elem.size.height / 2 >
+                  elem.pos.y + elem.size.height >
                   pageHeight
               ) {
                   setPageHeight(
-                      elem.pos.y + elem.size.height / 2,
+                      elem.pos.y + elem.size.height,
                   );
               }
               return (
@@ -183,9 +361,6 @@ function DragDrop({
             <aside>
                     {/* <BCLogo pending={pending} /> */}
 
-                    {mode == EditorModes.EDIT && selected[0] && selected[0].length > 20 && (
-                        <MobileBoundary />
-                    )}
                     {mode == EditorModes.EDIT && pastItems.length > 1 && (
                         <div
                             style={{

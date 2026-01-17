@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react';
 import EditItem from './DDEditor/EditItem';
 import ColorPicker from '../utils/ui/ColorPicker';
 import SiteContext from '../pageContext';
+import { registerComponent } from './registry';
 
 function DraggableCrypto(props) {
     const { elemData, selected } = props;
@@ -54,5 +55,21 @@ function DraggableCrypto(props) {
         </>
     );
 }
+
+// Register this component
+registerComponent({
+    type: 'crypto',
+    Component: DraggableCrypto,
+    button: {
+        icon: 'fas fa-terminal',
+        label: 'Add Code Snippet',
+        action: 'add',
+        object: {
+            type: 'crypto',
+            size: { width: 100, height: 100 },
+            text: 'Add your code here!',
+        },
+    },
+});
 
 export default DraggableCrypto;

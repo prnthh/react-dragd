@@ -1,47 +1,42 @@
 import React from 'react'
+import { styles, mergeStyles } from '../../styles';
 
 export default function DrawCoincides({ elemData, coincides, dragging }) {
     return (
         <>
             {dragging && elemData.pos.x == 0 && (
                 <div
-                    className={
-                        'page-align-guide active page-center-align-guide'
-                    }
-                    style={{
+                    style={mergeStyles(styles.pageAlignGuide, {
                         left: elemData.pos.x,
-                    }}
+                    })}
                 />
             )}
             {dragging && elemData.pos.x == 0 && (
                 <div
-                    className={'interthing-line-nub'}
-                    style={{
+                    style={mergeStyles(styles.interthingLineNub, {
                         left: elemData.pos.x,
                         top: elemData.pos.y,
                         transform: 'translateX(calc(50vw - 50%))',
-                    }}
+                    })}
                 />
             )}
 
             {dragging &&
                 coincides.length > 0 &&
-                coincides.map((coincide) => {
+                coincides.map((coincide, idx) => {
                     return (
-                        <>
+                        <React.Fragment key={idx}>
                             <div
-                                className={'interthing-line-nub'}
-                                style={{
+                                style={mergeStyles(styles.interthingLineNub, {
                                     left: coincide.pos.x,
                                     top: coincide.pos.y,
-                                }}
+                                })}
                             />
                             <div
-                                className={'interthing-line-nub'}
-                                style={{
+                                style={mergeStyles(styles.interthingLineNub, {
                                     left: elemData.pos.x,
                                     top: elemData.pos.y,
-                                }}
+                                })}
                             />
                             {coincide.pos.y == elemData.pos.y && (
                                 <div
@@ -81,7 +76,7 @@ export default function DrawCoincides({ elemData, coincides, dragging }) {
                                     }}
                                 />
                             )}
-                        </>
+                        </React.Fragment>
                     );
                 })}
         </>

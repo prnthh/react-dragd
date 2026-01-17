@@ -1,4 +1,5 @@
 import React from 'react'
+import { styles, mergeStyles } from '../../styles';
 
 export default function MobileBoundary ({mobileWidth = 600}) {
     return window.innerWidth > mobileWidth && <>
@@ -10,22 +11,20 @@ export default function MobileBoundary ({mobileWidth = 600}) {
 function Boundary({mobileWidth, right}) {
     return <>
     <div
-        className={'mobile-align-bg'}
-        style={{
-            position: 'fixed',
+        style={mergeStyles(styles.mobileAlignBg, {
+            position: 'absolute',
             left: right? undefined: `0px`,
             right: right? `0px`: undefined,
             width: `calc((100vw - ${mobileWidth}px)/2)`,
-            height: '100vh',
-        }}
+            height: '100%',
+        })}
     >
         <div
-            className={'page-align-guide mobile-align-guide active'}
-            style={{
+            style={mergeStyles(styles.pageAlignGuide, styles.mobileAlignGuide, {
                 position: "absolute",
                 right: right? undefined: "0px",
                 left: right? "0px": undefined,
-            }}
+            })}
         />
         <div
             style={{

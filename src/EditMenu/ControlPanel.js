@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { guidGenerator } from '../utils/helpers';
 import SiteContext from '../pageContext';
+import { styles, mergeStyles } from '../styles';
 
 function DefaultControlPanel({
     saveElemJson,
@@ -21,44 +22,44 @@ function DefaultControlPanel({
             <div
                 style={{
                     position: 'absolute',
-                    top: elemData.pos.y - elemData.size.height / 2,
+                    top: elemData.pos.y,
                     left: elemData.pos.x,
+                    transform: 'translateX(-50%)',
                     zIndex: 99999999999,
-                    display: 'flex',
-                    justifyContent: 'center',
+                    pointerEvents: 'none',
                 }}
-                onClick={handleEvent}
-                onMouseDown={handleEvent}
-                onTouchStart={handleEvent}
             >
                 <div
                     style={{
                         position: 'absolute',
-                        transform: `translate(0, calc(-100% - 20px))`,
+                        left: '50%',
+                        transform: `translateX(-50%) translateY(calc(-100% - 20px))`,
+                        pointerEvents: 'auto',
                     }}
+                    onClick={handleEvent}
+                    onMouseDown={handleEvent}
+                    onTouchStart={handleEvent}
                 >
                     {secondaryPanel && (
                         <div
                             onClick={(e)=>{e.stopPropagation();}}
-                            className={'cpanel cpanel-shadow'}
-                            style={{
+                            style={mergeStyles(styles.cpanel, styles.cpanelShadow, {
                                 padding: 10,
                                 marginBottom: 5,
                                 width: 'fit-content',
                                 position: 'relative',
-                            }}
+                            })}
                         >
                             {secondaryPanel}
                         </div>
                     )}
                     <div
-                        className={'cpanel cpanel-shadow'}
-                        style={{
+                        style={mergeStyles(styles.cpanel, styles.cpanelShadow, {
                             padding: 10,
                             position: 'relative',
-                        }}
+                        })}
                     >
-                        <div className={'flexRow'}>
+                        <div style={styles.flexRow}>
                             {CustomPanel && (
                                 <CustomPanel
                                     setPanelControls={setSecondaryPanel}
@@ -78,7 +79,7 @@ function DefaultControlPanel({
                                 />
                             )}
                             <div
-                                className={'cbutton cbuttoninner'}
+                                style={mergeStyles(styles.cbutton, styles.cbuttoninner)}
                                 onClick={() => {
                                     setModal(
                                         <UriInputModal
@@ -94,7 +95,7 @@ function DefaultControlPanel({
                                 <i className="fas fa-link"></i>
                             </div>
                             <div
-                                className={'cbutton cbuttoninner'}
+                                style={mergeStyles(styles.cbutton, styles.cbuttoninner)}
                                 onClick={() => {
                                     saveElemJson({
                                         zIndex: elemData.zIndex + 1000,
@@ -104,7 +105,7 @@ function DefaultControlPanel({
                                 <i className="fas fa-arrow-circle-up"></i>
                             </div>
                             <div
-                                className={'cbutton cbuttoninner'}
+                                style={mergeStyles(styles.cbutton, styles.cbuttoninner)}
                                 onClick={() => {
                                     saveElemJson({
                                         zIndex: elemData.zIndex - 1000,
@@ -114,10 +115,10 @@ function DefaultControlPanel({
                                 <i className="fas fa-arrow-circle-down"></i>
                             </div>
                             <div
-                                className={'cbutton cbuttoninner'}
+                                style={mergeStyles(styles.cbutton, styles.cbuttoninner)}
                                 onClick={() => {
-                                    addItemToList({...elemData, 
-                                        pos: {x: elemData.pos.x + 10, y: elemData.pos.y + 10}, 
+                                    addItemToList({...elemData,
+                                        pos: {x: elemData.pos.x + 10, y: elemData.pos.y + 10},
                                         id: new guidGenerator()
                                     });
                                 }}
@@ -125,7 +126,7 @@ function DefaultControlPanel({
                                 <i className="fas fa-copy"></i>
                             </div>
                             <div
-                                className={'cbutton cbuttoninner'}
+                                style={mergeStyles(styles.cbutton, styles.cbuttoninner)}
                                 onClick={() => {
                                     deleteItemFromList(elemData.id);
                                 }}
@@ -149,23 +150,20 @@ function UriInputModal(props) {
     return (
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <input
-                className={'minimal-input'}
-                style={{ display: 'flex', flexGrow: 1 }}
+                style={mergeStyles(styles.minimalInput, { display: 'flex', flexGrow: 1 })}
                 autoFocus={true}
                 defaultValue={value}
                 onChange={(e) => {
                     setValue(e.target.value);
                 }}
-            ></input>
+            />
             <button
-                className={'button'}
                 onClick={() => {
                     props.onComplete(value);
                 }}
             >
                 Set
             </button>
-            <div className="is-divider" data-content="OR"></div>
         </div>
     );
 }

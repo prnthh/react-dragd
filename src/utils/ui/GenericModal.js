@@ -1,11 +1,17 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { styles, mergeStyles } from '../../styles';
 
 function GenericModal(props) {
     return (
-        <div className="dragd-modal" style={{ zIndex: 999999999999 }}>
-            <div className="dragd-modal-background" onClick={() => props.onDone()} />
-            <div className="modal-content">
-                <div className="card-content">
+        <div 
+            style={mergeStyles(styles.dragdModal, { zIndex: 999999999999 })}
+            onClick={() => props.onDone()}
+        >
+            <div 
+                style={styles.dragdModalContent}
+                onClick={(e) => e.stopPropagation()}
+            >
+                <div>
                     {props.content && props.content}
                 </div>
             </div>
