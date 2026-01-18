@@ -3,6 +3,9 @@
 import React from "react";
 import DragDrop from "../../src/index.js";
 
+// Import custom component - this registers it automatically
+import "../components/DraggableHtml.js";
+
 export default function Home() {
     return (
         <main style={{ minHeight: "100vh", padding: "32px" }}>

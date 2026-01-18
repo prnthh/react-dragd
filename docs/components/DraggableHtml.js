@@ -1,11 +1,23 @@
+/**
+ * DraggableHtml - Example custom component for react-dragd
+ *
+ * This component demonstrates how to create a custom draggable component
+ * with Monaco editor for HTML/Markdown editing.
+ *
+ * Dependencies required in your project:
+ * - @monaco-editor/react
+ * - react-markdown
+ * - rehype-raw
+ */
+
 import React, { useState, useContext } from 'react';
-import EditItem from './DDEditor/EditItem';
-import SiteContext from '../pageContext';
+import EditItem from '../../src/Components/DDEditor/EditItem';
+import SiteContext from '../../src/pageContext';
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import Editor from '@monaco-editor/react';
-import { styles, mergeStyles } from '../styles';
-import { registerComponent } from './registry';
+import { styles, mergeStyles } from '../../src/styles';
+import { registerComponent } from '../../src/Components/registry';
 
 function PanelControls({ onLocalUpdate, elemData, setModal }) {
     function CodeEditor() {
@@ -111,7 +123,6 @@ function PanelControls({ onLocalUpdate, elemData, setModal }) {
                             } else if (fileType === 'js') {
                                 data = { js: v, subtype: 'html' };
                             }
-                            console.log(data);
                             onLocalUpdate(data);
                         }}
                     />
@@ -181,11 +192,9 @@ function DraggableHtml(props) {
                 )}
                 {elemData.subtype == 'md' && (
                     <div>
-                        <ReactMarkdown
-                            rehypePlugins={[rehypeRaw]}
-                            children={elemData.text}
-                            allowDangerousHtml
-                        />
+                        <ReactMarkdown rehypePlugins={[rehypeRaw]}>
+                            {elemData.text}
+                        </ReactMarkdown>
                     </div>
                 )}
             </EditItem>
@@ -193,7 +202,7 @@ function DraggableHtml(props) {
     );
 }
 
-// Register this component for multiple types
+// Register this component - this adds it to the editor toolbar
 registerComponent({
     type: ['markdown', 'code'],
     Component: DraggableHtml,
@@ -203,8 +212,9 @@ registerComponent({
         action: 'add',
         object: {
             type: 'code',
-            size: { width: 100, height: 100 },
-            text: 'Add your code here!',
+            size: { width: 300, height: 200 },
+            text: '# Hello World\n\nEdit this markdown!',
+            subtype: 'md',
         },
     },
 });

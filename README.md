@@ -5,7 +5,7 @@ A drag-and-drop page builder and viewer library for React. Build dynamic, editab
 [![npm version](https://img.shields.io/npm/v/react-dragd.svg)](https://www.npmjs.com/package/react-dragd)
 [![license](https://img.shields.io/npm/l/react-dragd.svg)](https://github.com/prnthh/react-dragd/blob/main/LICENSE)
 
-[Live Demo on CodeSandbox](https://codesandbox.io/s/dragd-template-joh6v3)
+[Live Demo on StackBlitz](https://stackblitz.com/edit/react-dragd)
 
 ## Features
 
@@ -107,8 +107,6 @@ const savedState = JSON.parse(localStorage.getItem('my-page'));
 | **Image** | Upload images or use URLs |
 | **Square** | Colored rectangles with customizable borders |
 | **Circle** | Circular shapes with color fills |
-| **HTML/Markdown** | Code blocks with Monaco editor and markdown rendering |
-| **Code Snippet** | Display code with syntax highlighting |
 
 ## Custom Components
 
@@ -209,6 +207,10 @@ registerComponent({
   Component: MyComponent
 });
 ```
+
+### Example: HTML/Markdown Component
+
+See [docs/components/DraggableHtml.js](https://github.com/prnthh/react-dragd/blob/main/docs/components/DraggableHtml.js) for a full example of a custom component with Monaco editor integration for editing HTML and Markdown content.
 
 ## State Format
 
